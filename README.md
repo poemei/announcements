@@ -1,6 +1,11 @@
 # announcements
-The Chaos MVC Announcements Module
-An announcements Addon Module for the Chaos MVC
+*An announcements Addon Module for the Chaos MVC*
+
+![PHP](https://img.shields.io/badge/PHP-8%2B-blue)
+![Architecture](https://img.shields.io/badge/Architecture-MVC-darkgreen)
+![Status](https://img.shields.io/badge/Status-Active%20Development-orange)
+![License](https://img.shields.io/badge/License-TBD-lightgrey)
+![Sponsored](https://img.shields.io/badge/Created-Poe_Mei-blue)
 
 # Install
 1. Use `install/announcements.sql` to setup the announcements data table
