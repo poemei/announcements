@@ -1,6 +1,8 @@
 <?php
 // path: /user/modules/announcements/views/public/announcements/index.php
 
+/* [AI:GPT-5.6 | 2026-09-01 05:00:00 UTC] */
+
 require APPROOT . '/views/inc/head.php';
 
 $items = is_array($data['items'] ?? null)
@@ -49,3 +51,4 @@ $items = is_array($data['items'] ?? null)
 </section>
 
 <?php require APPROOT . '/views/inc/foot.php'; ?>
+<?php /* [End AI:GPT-5.6] */ ?>

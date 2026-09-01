@@ -1,150 +1,40 @@
 <?php
-// path: /user/modules/announcements/models/announcements_model.php
 
-/* [AI:OpenAI Codex | 2026-08-26 08:01:32 UTC] */
-class announcements_model extends model
+declare(strict_types=1);
+
+/* [AI:GPT-5.6 | 2026-09-01 05:00:00 UTC] */
+final class announcements_model extends model
 {
-    /**
-     * Announcement table name.
-     *
-     * @var string
-     */
-    protected $table = 'announcements';
+    private const TABLE = 'announcements';
 
-    /**
-     * Fetch all announcements for administration.
-     *
-     * @return array
-     */
-    public function get_all()
+    public function getAll(): array
     {
-        // The table is explicitly defined for the query.
-        return $this->db
-            ->query("SELECT * FROM {$this->table} ORDER BY id DESC")
-            ->fetchAll();
+        return $this->fetchAll('SELECT * FROM `announcements` ORDER BY `id` DESC');
     }
 
-    /**
-     * Fetch one announcement by identifier.
-     *
-     * @param int $id Announcement identifier.
-     *
-     * @return array|false
-     */
-    public function get_by_id($id)
+    public function getById(int $id)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE id = :id LIMIT 1";
-
-        return $this->fetch($sql, ['id' => (int) $id]);
+        return $this->fetch('SELECT * FROM `announcements` WHERE `id` = :id LIMIT 1', ['id' => $id]);
     }
 
-    /**
-     * Update an existing announcement.
-     *
-     * @param int   $id   Announcement identifier.
-     * @param array $data Updated announcement values.
-     *
-     * @return bool
-     */
-    public function update_announcement($id, $data)
+    public function getActive(): array
     {
-        $sql = "UPDATE {$this->table}
-            SET title = :title,
-                body = :body,
-                published = :published
-            WHERE id = :id";
-
-        $statement = $this->db->prepare($sql);
-
-        return $statement->execute([
-            'title' => (string) $data['title'],
-            'body' => (string) $data['body'],
-            'published' => (int) $data['published'],
-            'id' => (int) $id,
-        ]);
+        return $this->fetchAll('SELECT * FROM `announcements` WHERE `published` = :published ORDER BY `created_at` DESC', ['published' => 1]);
     }
 
-    /**
-     * Delete an announcement.
-     *
-     * @param string $table The table name.
-     * @param string $where The WHERE clause (e.g., "id = 5").
-     *
-     * @return mixed
-     */
-    public function delete_by_id($id)
+    public function createAnnouncement(array $data): int
     {
-        $statement = $this->db->prepare(
-            "DELETE FROM {$this->table} WHERE id = :id"
-        );
-
-        return $statement->execute([
-            'id' => (int) $id,
-        ]);
+        return (int) $this->insert(self::TABLE, $data);
     }
 
-    /**
-     * Fetch only published rows.
-     *
-     * @return array
-     */
-    public function get_active()
+    public function updateAnnouncement(int $id, array $data): void
     {
-        $sql = "SELECT * FROM {$this->table}
-            WHERE published = 1
-            ORDER BY created_at DESC";
-
-        return $this->fetchAll($sql);
+        $this->update(self::TABLE, $data, 'id = :record_id', ['record_id' => $id]);
     }
 
-    /**
-     * Insert a published announcement.
-     *
-     * @param array $data Announcement values.
-     *
-     * @return mixed
-     */
-    public function add($data)
+    public function deleteAnnouncement(int $id): void
     {
-        // Insert new announcement.
-        return $this->insert($this->table, [
-            'title' => $data['title'],
-            'body' => $data['body'],
-            'published' => 1,
-        ]);
-    }
-
-    /**
-     * Fetch the latest published announcements.
-     *
-     * @param int $limit Maximum number of announcements.
-     *
-     * @return array
-     */
-    public function get_latest($limit = 5)
-    {
-        $sql = "SELECT * FROM {$this->table}
-            WHERE published = 1
-            ORDER BY created_at DESC
-            LIMIT :limit";
-
-        // Use the base model's fetchAll with the limit parameter.
-        return $this->fetchAll($sql, ['limit' => (int) $limit]);
-    }
-
-    /**
-     * Fetch the latest published announcement.
-     *
-     * @return array|false
-     */
-    public function get_latest_single()
-    {
-        $sql = "SELECT * FROM {$this->table}
-            WHERE published = 1
-            ORDER BY created_at DESC
-            LIMIT 1";
-
-        return $this->fetch($sql);
+        $this->query('DELETE FROM `announcements` WHERE `id` = :id', ['id' => $id]);
     }
 }
-/* [End AI:OpenAI Codex] */
+/* [End AI:GPT-5.6] */

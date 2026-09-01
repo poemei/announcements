@@ -1,114 +1,89 @@
 <?php
-// path: /user/modules/announcements/controllers/announcements.php
 
-/* [AI:OpenAI Codex | 2026-08-26 08:01:32 UTC] */
-class announcements extends controller
+declare(strict_types=1);
+
+/* [AI:GPT-5.6 | 2026-09-01 05:00:00 UTC] */
+final class announcements extends controller
 {
-    /**
-     * Display the public announcements index.
-     *
-     * @param array $url Route parameters.
-     *
-     * @return void
-     */
-    public function index($url = [])
+    private const ADMIN_ACTIONS = ['create', 'update', 'delete'];
+
+    public function index(array $params = []): void
     {
-        $data = ['items' => []];
         $model = $this->model('announcements_model');
-
-        if (method_exists($model, 'get_active')) {
-            $data['items'] = $model->get_active();
-        }
-
-        $this->view('public/announcements/index', $data);
+        $this->view('index', ['items' => $model->getActive()]);
     }
 
-    /**
-     * Display and process announcement administration.
-     *
-     * @param array $params Route parameters.
-     *
-     * @return void
-     */
-    public function admin($params = [])
+    public function admin(array $params = []): void
     {
-        $data = [
-            'items' => [],
-            'edit_item' => false,
-        ];
-
-        if (!isset($_SESSION['user_level']) || $_SESSION['user_level'] < 7) {
-            header('Location: /auth/login');
-            exit;
-        }
-
+        $this->require_admin(7);
         $model = $this->model('announcements_model');
 
-        $action = $params[1] ?? null;
-        $id = isset($params[2]) ? (int) $params[2] : 0;
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $this->require_csrf();
-        }
+            $action = trim((string) ($_POST['action'] ?? ''));
+            if (!in_array($action, self::ADMIN_ACTIONS, true)) {
+                http_response_code(400);
+                $this->error_page('Invalid Announcements module action.');
+            }
 
-        // ACTION: POST-based Deletion
-        if (
-            $_SERVER['REQUEST_METHOD'] === 'POST'
-            && isset($_POST['delete_id'])
-        ) {
-            $model->delete_by_id((int) $_POST['delete_id']);
-            header('Location: /admin/announcements');
-            exit;
-        }
-
-        // ACTION: Update Existing Announcement
-        if (
-            $_SERVER['REQUEST_METHOD'] === 'POST'
-            && isset($_POST['edit_id'], $_POST['title'], $_POST['body'])
-        ) {
-            $editId = (int) $_POST['edit_id'];
-
-            if ($editId > 0) {
-                $model->update_announcement($editId, [
-                    'title' => trim((string) $_POST['title']),
-                    'body' => trim((string) $_POST['body']),
-                    'published' => isset($_POST['published']) ? 1 : 0,
-                ]);
+            $id = $this->validId($_POST['id'] ?? null);
+            if ($action === 'delete') {
+                if ($id === null) {
+                    $this->invalidRecord();
+                }
+                $model->deleteAnnouncement($id);
+            } else {
+                $announcement = $this->validatedAnnouncement($_POST);
+                if ($action === 'create') {
+                    $model->createAnnouncement($announcement);
+                } elseif ($id === null) {
+                    $this->invalidRecord();
+                } else {
+                    $model->updateAnnouncement($id, $announcement);
+                }
             }
 
             header('Location: /admin/announcements');
             exit;
         }
 
-        // ACTION: New Addition
-        if (
-            $_SERVER['REQUEST_METHOD'] === 'POST'
-            && isset($_POST['title'], $_POST['body'])
-        ) {
-            $model->insert('announcements', [
-                'title' => trim((string) $_POST['title']),
-                'body' => trim((string) $_POST['body']),
-                'published' => isset($_POST['published']) ? 1 : 0,
-            ]);
-            header('Location: /admin/announcements');
-            exit;
-        }
-
-        // ACTION: Load Existing Announcement Into the Shared Form
-        if ($action === 'edit' && $id > 0) {
-            $data['edit_item'] = $model->get_by_id($id);
-
-            if (!$data['edit_item']) {
-                header('Location: /admin/announcements');
-                exit;
+        $action = (string) ($params[1] ?? $params[0] ?? '');
+        $rawId = $params[2] ?? $params[1] ?? null;
+        $editItem = null;
+        if ($action === 'edit') {
+            $id = $this->validId($rawId);
+            if ($id === null || !is_array($editItem = $model->getById($id))) {
+                $this->invalidRecord();
             }
         }
 
-        if (method_exists($model, 'get_all')) {
-            $data['items'] = $model->get_all();
-        }
+        $this->view('admin/index', [
+            'items' => $model->getAll(),
+            'edit_item' => $editItem,
+        ]);
+    }
 
-        $this->view('admin/announcements', $data);
+    private function validatedAnnouncement(array $input): array
+    {
+        $title = trim((string) ($input['title'] ?? ''));
+        $body = trim((string) ($input['body'] ?? ''));
+        if ($title === '' || strlen($title) > 255 || $body === '') {
+            http_response_code(422);
+            $this->error_page('Enter a valid announcement title and body.');
+        }
+        return ['title' => $title, 'body' => $body, 'published' => isset($input['published']) ? 1 : 0];
+    }
+
+    private function validId($value): ?int
+    {
+        $id = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        return $id === false || $id === null ? null : (int) $id;
+    }
+
+    private function invalidRecord(): void
+    {
+        http_response_code(400);
+        $this->error_page('Invalid Announcement record.');
     }
 }
-/* [End AI:OpenAI Codex] */
+/* [End AI:GPT-5.6] */
