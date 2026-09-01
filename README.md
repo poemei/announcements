@@ -1,50 +1,26 @@
 # announcements
-*An announcements Addon Module for the Chaos MVC*
 
-![PHP](https://img.shields.io/badge/PHP-8%2B-blue)
-![Architecture](https://img.shields.io/badge/Architecture-MVC-darkgreen)
-![Status](https://img.shields.io/badge/Status-Active%20Development-orange)
-![License](https://img.shields.io/badge/License-TBD-lightgrey)
-![Sponsored](https://img.shields.io/badge/Created-Poe_Mei-blue)
+The Public announcements module for the ChAoS MVC
 
-# Install
-1. Use `install/announcements.sql` to setup the announcements data table
-2. Copy all of the contents in `app` to `app` of your Chaos MVC domain.
-3. Log into your website and go to its `admin`
-4. Click on announcements
+## Version
 
-Example Usage:
-```php
-<div class="row">
-   <h2>Announcements</h2>
-  <?php 
-  // Announcements
-  if(isset($data['featured_announcement']) && $data['featured_announcement'] !== false) : 
-      $post = $data['featured_announcement']; 
-  ?>
+1.3.1
 
-    <section id="latest-announcement">
+## Module Location
 
-      <div class="announcement-content">
+```text
+/user/modules/announcements
+```
 
-        <h3><?= htmlspecialchars($post['title']); ?></h3>
+## Module Files
 
-        <p>
-          <?= nl2br(htmlspecialchars($post['body'])); ?>
-        </p>
+```text
+/user/modules/announcements/controllers/announcements.php
+/user/modules/announcements/models/announcements_model.php
+/user/modules/announcements/views/admin/announcements.php
+/user/modules/announcements/module.json
+```
 
-        <small>
-          Posted: <?= date('Y.m.d', strtotime($post['created_at'])); ?>
-        </small>
+## Administration
 
-      </div>
-
-    </section>
-
-  <?php endif; ?>
-
-  </div>
-  <hr>
-  ```
-  
-  This will grab the latest announcement from the announcements table.
+Open `/admin/announcements` after installing the module.
