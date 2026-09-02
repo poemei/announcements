@@ -1,5 +1,13 @@
 # Announcements Module Changes
 
+## 1.3.3 - 2026-08-31
+
+- Restored the established `get_latest_single()`, `get_latest()`, `get_active()`, `get_all()`, and `get_by_id()` read APIs used by existing domain modules.
+- Preserved the compliant internal CRUD implementation without breaking installed consumers such as Home.
+- Restored Admin edit routing for both supported Core parameter shapes.
+- Restored a clearly visible Edit action in the Admin announcement list.
+- Removed remaining surface and color assumptions so the Admin view follows the active theme.
+
 ## 1.3.2 - 2026-08-31
 
 - Added explicit allowlisted Admin actions for create, update, and delete.

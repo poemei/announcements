@@ -22,6 +22,52 @@ final class announcements_model extends model
         return $this->fetchAll('SELECT * FROM `announcements` WHERE `published` = :published ORDER BY `created_at` DESC', ['published' => 1]);
     }
 
+    /** Compatibility API used by existing domain modules. */
+    public function get_latest_single()
+    {
+        return $this->fetch(
+            'SELECT * FROM `announcements` '
+            . 'WHERE `published` = :published '
+            . 'ORDER BY `created_at` DESC LIMIT 1',
+            ['published' => 1]
+        );
+    }
+
+    /** Compatibility API used by existing domain modules. */
+    public function get_latest(int $limit = 5): array
+    {
+        $limit = max(1, min($limit, 50));
+
+        $statement = $this->db->prepare(
+            'SELECT * FROM `announcements` '
+            . 'WHERE `published` = :published '
+            . 'ORDER BY `created_at` DESC LIMIT :result_limit'
+        );
+        $statement->bindValue(':published', 1, PDO::PARAM_INT);
+        $statement->bindValue(':result_limit', $limit, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /** Compatibility API retained for installed consumers. */
+    public function get_active(): array
+    {
+        return $this->getActive();
+    }
+
+    /** Compatibility API retained for installed consumers. */
+    public function get_all(): array
+    {
+        return $this->getAll();
+    }
+
+    /** Compatibility API retained for installed consumers. */
+    public function get_by_id(int $id)
+    {
+        return $this->getById($id);
+    }
+
     public function createAnnouncement(array $data): int
     {
         return (int) $this->insert(self::TABLE, $data);

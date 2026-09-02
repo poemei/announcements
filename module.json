@@ -1,7 +1,7 @@
 {
     "name": "announcements",
     "module": "announcements",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "description": "The Public announcements module for the ChAoS MVC",
 	"update_url": "https://poemei.com/updates/announcements.json",
     "creator": "PM",

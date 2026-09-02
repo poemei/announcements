@@ -4,7 +4,7 @@ The Public announcements module for the ChAoS MVC
 
 ## Version
 
-1.3.2
+1.3.3
 
 ## Module Location
 
