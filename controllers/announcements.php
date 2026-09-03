@@ -49,14 +49,17 @@ final class announcements extends controller
 
         $editItem = null;
         $editOffset = array_search('edit', $params, true);
-        if ($editOffset !== false) {
-            $id = $this->validId($params[$editOffset + 1] ?? null);
+        $requestedEditId = $editOffset !== false
+            ? ($params[$editOffset + 1] ?? null)
+            : ($_GET['edit'] ?? null);
+        if ($requestedEditId !== null) {
+            $id = $this->validId($requestedEditId);
             if ($id === null || !is_array($editItem = $model->getById($id))) {
                 $this->invalidRecord();
             }
         }
 
-        $this->view('admin/index', [
+        $this->view('admin/announcements', [
             'items' => $model->getAll(),
             'edit_item' => $editItem,
         ]);

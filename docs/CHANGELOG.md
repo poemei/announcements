@@ -1,5 +1,17 @@
 # Announcements Module Changes
 
+## 1.3.4 - 2026-09-02
+
+- Restored the missing `views/admin/index.php` Admin interface.
+- Added visible, functional Edit and Delete controls for every announcement.
+- Added create and edit forms with published/draft control.
+- Kept all create, update, and delete operations behind administrator authorization and CSRF verification.
+- Supported both `/admin/announcements/edit/{id}` and `/admin/announcements?edit={id}` edit selection.
+- Corrected the controller to resolve the declared `admin/announcements` module view.
+- Replaced the legacy signing algorithm field with the canonical signing metadata shape.
+- Removed hard-coded dark and light presentation choices from the delivered Admin interface.
+- Corrected the version to reflect the delivered Admin behavior.
+
 ## 1.3.3 - 2026-08-31
 
 - Restored the established `get_latest_single()`, `get_latest()`, `get_active()`, `get_all()`, and `get_by_id()` read APIs used by existing domain modules.
